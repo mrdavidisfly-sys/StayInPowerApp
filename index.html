@@ -1,5 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><title>Stay In Power App</title></head>
-<body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stay In Power | v2 Mar 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#0D0D0D;color:#F5F0E8;-webkit-font-smoothing:antialiased;}
+button{font-family:'Inter',sans-serif;}
+input{font-family:'Inter',sans-serif;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:#111;}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const G = "#C9A84C", GL = "#E8C97A", GD = "#9A7A2E";
+
+const QUESTIONS = [
+  {id:1,text:"I enjoy organizing details to make events run smoothly.",gift:"Administrator"},
+  {id:2,text:"I feel a deep urge to help people who are hurting or in crisis.",gift:"Mercy-Shower"},
+  {id:3,text:"I find it easy to explain complex Bible truths to others.",gift:"Teacher"},
+  {id:4,text:"I am quick to notice physical needs — cleaning, fixing, setting up.",gift:"Servant"},
+  {id:5,text:"I love encouraging people to take the next step in their faith.",gift:"Exhorter"},
+  {id:6,text:"I look for opportunities to give money or resources strategically.",gift:"Giver"},
+  {id:7,text:"I am comfortable starting conversations with strangers about God.",gift:"Evangelist"},
+  {id:8,text:"I tend to see the big picture and the steps needed to get there.",gift:"Administrator"},
+  {id:9,text:"I am very sensitive to the emotional atmosphere of a room.",gift:"Mercy-Shower"},
+  {id:10,text:"I spend a lot of time researching to ensure I have the facts right.",gift:"Teacher"},
+  {id:11,text:"I'd rather work behind the scenes than be in the spotlight.",gift:"Servant"},
+  {id:12,text:"I enjoy challenging people to live up to their full potential.",gift:"Exhorter"},
+  {id:13,text:"I am willing to lower my standard of living to give more away.",gift:"Giver"},
+  {id:14,text:"I feel a burden for people who don't know Jesus yet.",gift:"Evangelist"},
+  {id:15,text:"I enjoy creating systems or schedules that help others.",gift:"Administrator"},
+  {id:16,text:"I find myself drawn to people who are lonely or overlooked.",gift:"Mercy-Shower"},
+  {id:17,text:"I get excited when I see the lightbulb go on for someone else.",gift:"Teacher"},
+  {id:18,text:"I see to-do lists as opportunities to serve the body of Christ.",gift:"Servant"},
+  {id:19,text:"People often come to me when they need a pep talk or advice.",gift:"Exhorter"},
+  {id:20,text:"I manage my finances specifically so I can be a blessing to others.",gift:"Giver"},
+  {id:21,text:"I am always thinking about how to reach our community or city.",gift:"Evangelist"}
+];
+
+const GIFTS = {
+  "Administrator":{emoji:"📋",tagline:"The Architect of the Vision",desc:"You bring order to purpose. God gave you the rare ability to see the path from where things are to where they need to be. You create the systems and structure that allow a vision to breathe and function.",marriage:"You are the one who makes sure the mission doesn't stay a dream. Your spouse needs your clarity — not just your lists."},
+  "Mercy-Shower":{emoji:"💛",tagline:"The Heartbeat of the Home",desc:"You carry people before God carries you to them. You feel what others feel. You sit in the tension with people rather than trying to fix them. This gift creates safety wherever you go.",marriage:"You make your home a refuge for every soul who enters. You teach your family what it means to stay when it's hard — because love stayed for you."},
+  "Teacher":{emoji:"📖",tagline:"The Illuminator",desc:"You don't just know things — you need others to know them too. You can't watch someone struggle with what you understand. You research, clarify, simplify. Truth matters deeply to you.",marriage:"You create a learning environment for your family. You help your spouse and children understand who they are and why they're here. Don't hoard the revelation — share it."},
+  "Servant":{emoji:"🙌",tagline:"The Foundation of the House",desc:"You see needs before anyone else names them. You are the first to set up and last to leave. Your contribution is often invisible — but without it, nothing holds together.",marriage:"You are the stability every family needs. Your consistency is a form of faithfulness. Allow yourself to receive — your marriage needs your presence, not just your labor."},
+  "Exhorter":{emoji:"🔥",tagline:"The Activator",desc:"You call people forward. You see potential others can't see in themselves, and you refuse to let them settle. You say 'not yet, but soon' — and they believe you.",marriage:"You are the champion of your spouse's calling. You know what they can become before they do. Channel that fire home first — then release it into the Kingdom."},
+  "Giver":{emoji:"💰",tagline:"The Kingdom Investor",desc:"You see resources as tools for transformation. Generosity isn't a struggle — it's a strategy. You understand that what you release comes back multiplied.",marriage:"You model a theology of enough for everyone. Use this gift to fund the ministry your marriage is called to build."},
+  "Evangelist":{emoji:"📣",tagline:"The Bridge Builder",desc:"You can't rest knowing people are disconnected from their purpose. You naturally build bridges between people and God, between strangers and community.",marriage:"You keep the mission outward-facing. Make sure your home base is strong before you run out — your family is your first congregation."}
+};
+
+const COMBOS = {
+  "Administrator+Mercy-Shower":{name:"Strategic Compassion",desc:"You build systems that carry people. One creates the structure; the other makes sure every soul feels seen. Ministries are built on exactly this combination.",mission:"We exist to build environments where people are organized, cared for, and pointed toward their purpose."},
+  "Administrator+Teacher":{name:"Clarity & Order",desc:"You don't just share truth — you build the infrastructure for people to walk in it. Your marriage is a school with a great curriculum and an even better administration.",mission:"We exist to create clarity in chaos and equip people to understand and act on God's truth."},
+  "Administrator+Servant":{name:"Operational Excellence",desc:"You are the backbone of every team you join. Nothing gets dropped, nothing falls through the cracks. Your marriage is a model of quiet, powerful faithfulness.",mission:"We exist to serve with excellence so the vision of God is never delayed by disorder."},
+  "Administrator+Exhorter":{name:"Vision with Execution",desc:"You see the destination AND build the road. One calls people higher; the other makes sure the path is there when they step out. This is a leadership combination.",mission:"We exist to cast vision and build the structures that turn potential into transformation."},
+  "Administrator+Giver":{name:"Strategic Generosity",desc:"You don't just give — you invest with a plan. Your marriage understands stewardship at a deep level and releases resources with precision and purpose.",mission:"We exist to steward what God has given us with excellence and release it to fuel Kingdom advancement."},
+  "Administrator+Evangelist":{name:"Organized Outreach",desc:"You build systems to reach people. One burns with urgency; the other makes sure the mechanism handles the harvest. Your marriage scales mission.",mission:"We exist to create sustainable pathways that connect people to the Kingdom in reproducible ways."},
+  "Mercy-Shower+Teacher":{name:"Informed Hospitality",desc:"You make people feel known and then show them the truth that sets them free. Safe space plus revelation — exactly what the church needs.",mission:"We exist to create environments where people feel deeply seen and are equipped with truth to walk forward."},
+  "Mercy-Shower+Servant":{name:"Radical Care",desc:"You are the hands and heart of Jesus in the room. Every practical need and every broken heart — you see them both and move toward them. Your home is a healing place.",mission:"We exist to meet people at the point of their pain and make them feel less alone."},
+  "Mercy-Shower+Exhorter":{name:"Compassionate Fire",desc:"You hold people with tenderness AND call them higher. You refuse to leave people where they are, but never make them feel bad about where they've been. This is transformational love.",mission:"We exist to sit with people in their pain and then refuse to let them stay there — activating them into purpose."},
+  "Mercy-Shower+Giver":{name:"Generous Refuge",desc:"You open your home, your resources, and your hearts. People come to your marriage and feel both materially and emotionally provided for.",mission:"We exist to pour out — financially, emotionally, and spiritually — so no one in our orbit lacks what they need."},
+  "Mercy-Shower+Evangelist":{name:"Compassionate Outreach",desc:"You build bridges to people through empathy first, mission second. People don't feel recruited — they feel loved into the Kingdom.",mission:"We exist to love people into the Kingdom — meeting them in their hurt and showing them a God who stays."},
+  "Teacher+Servant":{name:"Equipped & Available",desc:"You show people the way AND do the work. Your marriage is both a classroom and a workshop. People don't just learn truth with you — they see it demonstrated.",mission:"We exist to teach people what to do and then show up to do it with them."},
+  "Teacher+Exhorter":{name:"Transformational Influence",desc:"You teach people who they can be AND call them to step into it. This is the combination that moves people from knowledge to activation. This is the Edwards combination.",mission:"We build strong families through teaching, hospitality, and faith — equipping people with truth and calling them forward."},
+  "Teacher+Giver":{name:"Resourced Knowledge",desc:"You teach people AND invest in their ability to grow. People leave your orbit more knowledgeable and better resourced.",mission:"We exist to equip people with truth and the resources to walk in it."},
+  "Teacher+Evangelist":{name:"Truth on the Move",desc:"You carry knowledge AND urgency. You can't keep truth to yourself because you know too many people who need it. Your marriage is a mobile school.",mission:"We exist to take the truth on the road — teaching the Kingdom message to every community we enter."},
+  "Servant+Exhorter":{name:"Active Encouragement",desc:"You show up AND speak life. People feel both supported and challenged. Your marriage models what it looks like to love people with presence and words.",mission:"We exist to be present in people's lives — serving them consistently and calling them forward with our words."},
+  "Servant+Giver":{name:"Faithful Stewardship",desc:"You give your time AND your resources. Neither is held back. People around your marriage never feel alone practically or financially.",mission:"We exist to serve faithfully with everything we have — our time, our hands, and our resources."},
+  "Servant+Evangelist":{name:"Presence-Based Mission",desc:"You show up through service — and your presence opens doors for Kingdom conversations. You earn trust by showing up.",mission:"We exist to earn the right to speak into people's lives through consistent, faithful service."},
+  "Exhorter+Giver":{name:"Kingdom Momentum",desc:"You call people to their potential AND fund their ability to get there. You say 'you can do it' — then you provide the resources to prove it.",mission:"We exist to activate potential and remove every resource barrier standing between people and their calling."},
+  "Exhorter+Evangelist":{name:"Relentless Activation",desc:"You carry a fire that cannot be contained. One calls people higher; the other calls them in. Your marriage is an activation center for the Kingdom.",mission:"We exist to activate dormant calling in people's lives and send them into the Kingdom on fire."},
+  "Giver+Evangelist":{name:"Funded Outreach",desc:"You carry both the message AND the resources to support it. Your marriage doesn't just talk about mission — you fund it.",mission:"We exist to fund and advance the Kingdom — financially resourcing the mission God has called us to carry."}
+};
+
+function getCombo(a,b){
+  return COMBOS[a+"+"+b]||COMBOS[b+"+"+a]||{
+    name:"Unique Kingdom Fusion",
+    desc:`The combination of ${a} and ${b} creates a powerful ministry fingerprint few couples carry. Your gifts fill a gap that most cannot.`,
+    mission:`We exist as a unit to activate ${a.toLowerCase()} and ${b.toLowerCase()} in tandem, building something the Kingdom has been waiting for.`
+  };
+}
+
+function computeScores(answers){
+  const s={Administrator:0,"Mercy-Shower":0,Teacher:0,Servant:0,Exhorter:0,Giver:0,Evangelist:0};
+  QUESTIONS.forEach((q,i)=>{s[q.gift]=(s[q.gift]||0)+(answers[i]||0);});
+  return s;
+}
+
+function topGifts(scores){
+  return Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+}
+
+// BTN styles
+const btnGold = {background:`linear-gradient(135deg,${G} 0%,${GD} 100%)`,color:"#0D0D0D",border:"none",cursor:"pointer",fontFamily:"Inter,sans-serif",fontWeight:800,borderRadius:12};
+const btnGhost = {background:"transparent",border:"1px solid #333",color:"#888",cursor:"pointer",fontFamily:"Inter,sans-serif",fontWeight:600,borderRadius:12};
+
+function Hero({onStart}){
+  return(
+    <div style={{minHeight:"100vh",background:"radial-gradient(ellipse at 50% -10%, #2A1F00 0%, #0D0D0D 55%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:"40px 24px"}}>
+      <p style={{fontSize:11,fontWeight:700,letterSpacing:4,textTransform:"uppercase",color:G,marginBottom:20}}>March 29, 2026 · Marriage Life Group</p>
+      <h1 style={{fontSize:"clamp(56px,13vw,96px)",fontWeight:900,lineHeight:0.88,letterSpacing:-3,marginBottom:6}}>
+        <span style={{color:"#F5F0E8",display:"block"}}>Stay</span>
+        <span style={{color:GL,fontStyle:"italic",display:"block"}}>in</span>
+        <span style={{color:"#F5F0E8",display:"block"}}>Power</span>
+      </h1>
+      <p style={{fontSize:15,color:"#888",maxWidth:340,margin:"24px auto 40px",lineHeight:1.75}}>
+        Discover your gifts, activate your union, and <span style={{color:GL,fontWeight:600}}>find out what you're staying for.</span>
+      </p>
+      <button onClick={onStart} style={{...btnGold,fontSize:14,letterSpacing:1,textTransform:"uppercase",padding:"18px 52px",borderRadius:60,boxShadow:`0 4px 24px rgba(201,168,76,0.35)`}}>Begin Assessment</button>
+      <p style={{marginTop:28,fontSize:12,color:"#555",letterSpacing:0.5}}>David & Shanta Edwards · Facilitators</p>
+    </div>
+  );
+}
+
+function Setup({onBegin,onBack}){
+  const [na,setNa]=useState("");
+  const [nb,setNb]=useState("");
+  return(
+    <div style={{minHeight:"100vh",background:"#111",display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 24px"}}>
+      <div style={{maxWidth:460,width:"100%"}}>
+        <p style={{fontSize:11,fontWeight:700,letterSpacing:4,textTransform:"uppercase",color:G,marginBottom:16}}>Before We Begin</p>
+        <h2 style={{fontSize:26,fontWeight:900,marginBottom:10}}>Who's Taking <span style={{color:G}}>The Assessment?</span></h2>
+        <p style={{fontSize:14,color:"#888",lineHeight:1.7,marginBottom:28}}>Enter your names. Each spouse completes 21 questions individually — then we reveal your combined couple power.</p>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:28}}>
+          {[["Spouse A","👤",na,setNa],["Spouse B","👥",nb,setNb]].map(([label,icon,val,set])=>(
+            <div key={label} style={{background:"#1A1A1A",border:"2px solid #2A2A2A",borderRadius:16,padding:"20px 16px",textAlign:"center"}}>
+              <div style={{fontSize:28,marginBottom:8}}>{icon}</div>
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#555",marginBottom:10}}>{label}</div>
+              <input value={val} onChange={e=>set(e.target.value)} placeholder="First name" maxLength={20}
+                style={{background:"transparent",border:"none",borderBottom:"1px solid #333",color:"#F5F0E8",fontSize:17,fontWeight:700,width:"100%",textAlign:"center",padding:"4px 0",outline:"none"}}/>
+            </div>
+          ))}
+        </div>
+        <button onClick={()=>onBegin(na.trim()||"Spouse A",nb.trim()||"Spouse B")} style={{...btnGold,width:"100%",fontSize:15,padding:18,marginBottom:12}}>Let's Go ⚡️</button>
+        <button onClick={onBack} style={{...btnGhost,width:"100%",fontSize:14,padding:14}}>← Back</button>
+      </div>
+    </div>
+  );
+}
+
+function Assessment({spouseName,answers,onAnswer,onNext,onBack,qi}){
+  const q=QUESTIONS[qi];
+  const sel=answers[qi];
+  const isLast=qi===20;
+  const pct=((qi+1)/21*100).toFixed(1);
+  return(
+    <div style={{minHeight:"100vh",background:"#0D0D0D",display:"flex",flexDirection:"column"}}>
+      <div style={{background:"#161616",borderBottom:"1px solid #2A2A2A",padding:"16px 24px",position:"sticky",top:0,zIndex:10}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+          <span style={{fontSize:13,fontWeight:600,color:"#777"}}>{spouseName}'s Assessment</span>
+          <span style={{fontSize:13,fontWeight:600,color:"#777"}}>Q <span style={{color:G,fontWeight:800}}>{qi+1}</span> / 21</span>
+        </div>
+        <div style={{height:4,background:"#222",borderRadius:4,overflow:"hidden"}}>
+          <div style={{height:"100%",width:`${pct}%`,background:`linear-gradient(90deg,${G},${GL})`,borderRadius:4,transition:"width 0.35s"}}/>
+        </div>
+      </div>
+      <div style={{flex:1,padding:"36px 24px 40px",maxWidth:560,margin:"0 auto",width:"100%"}}>
+        <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",color:G,marginBottom:16}}>Question {q.id} of 21</p>
+        <p style={{fontSize:21,fontWeight:700,lineHeight:1.4,color:"#F5F0E8",marginBottom:36}}>{q.text}</p>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+          <span style={{fontSize:11,color:"#555"}}>Never</span>
+          <span style={{fontSize:11,color:"#555"}}>Always</span>
+        </div>
+        <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:40}}>
+          {[1,2,3,4,5].map(v=>(
+            <button key={v} onClick={()=>onAnswer(qi,v)} style={{
+              flex:1,aspectRatio:"1",maxWidth:68,
+              border:`2px solid ${sel===v?G:"#2A2A2A"}`,
+              background:sel===v?`linear-gradient(135deg,${G} 0%,${GD} 100%)`:"#1A1A1A",
+              color:sel===v?"#0D0D0D":"#666",
+              fontSize:18,fontWeight:800,borderRadius:14,cursor:"pointer",
+              boxShadow:sel===v?`0 4px 16px rgba(201,168,76,0.35)`:"none",
+              transition:"all 0.15s"
+            }}>{v}</button>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:12}}>
+          <button onClick={onBack} style={{...btnGhost,fontSize:14,fontWeight:600,padding:"14px 22px"}}>← Back</button>
+          <button onClick={()=>sel!==undefined&&onNext(isLast)} style={{
+            ...btnGold,flex:1,fontSize:15,padding:16,
+            opacity:sel!==undefined?1:0.35,
+            cursor:sel!==undefined?"pointer":"not-allowed"
+          }}>{isLast?"See My Results →":"Next →"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Transition({nameA,nameB,onContinue}){
+  return(
+    <div style={{minHeight:"100vh",background:"#111",display:"flex",alignItems:"center",justifyContent:"center",padding:40,textAlign:"center"}}>
+      <div>
+        <div style={{fontSize:64,marginBottom:20}}>🙌</div>
+        <h2 style={{fontSize:28,fontWeight:900,marginBottom:12}}>{nameA} is done!</h2>
+        <p style={{color:"#888",fontSize:15,lineHeight:1.75,marginBottom:36}}>Now it's <span style={{color:GL,fontWeight:700}}>{nameB}'s</span> turn.<br/>Same 21 questions. Same honesty.</p>
+        <button onClick={onContinue} style={{...btnGold,fontSize:14,letterSpacing:1,textTransform:"uppercase",padding:"18px 52px",borderRadius:60}}>Start {nameB}'s Assessment ⚡️</button>
+      </div>
+    </div>
+  );
+}
+
+function GiftCard({gift,rank,score}){
+  const d=GIFTS[gift];
+  const isPrimary=rank===1;
+  return(
+    <div style={{background:"#1A1A1A",border:`1px solid ${isPrimary?"#6B5010":"#2A2A2A"}`,borderRadius:20,padding:24,marginBottom:16,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:isPrimary?`linear-gradient(90deg,${G},${GL})`:"#3A3A3A"}}/>
+      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:14}}>
+        <div style={{fontSize:30,width:54,height:54,background:isPrimary?"rgba(201,168,76,0.1)":"rgba(255,255,255,0.04)",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{d.emoji}</div>
+        <div>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:2,textTransform:"uppercase",padding:"3px 10px",borderRadius:20,background:isPrimary?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.06)",color:isPrimary?G:"#666",marginBottom:6,display:"inline-block"}}>{isPrimary?"Primary Gift":"Secondary Gift"}</div>
+          <div style={{fontSize:20,fontWeight:900,color:"#F5F0E8"}}>{gift}</div>
+          <div style={{fontSize:12,color:"#666"}}>{d.tagline}</div>
+        </div>
+      </div>
+      <div style={{height:5,background:"#2A2A2A",borderRadius:5,marginBottom:14,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${Math.round(score/15*100)}%`,background:isPrimary?`linear-gradient(90deg,${G},${GL})`:"linear-gradient(90deg,#444,#666)",borderRadius:5}}/>
+      </div>
+      <p style={{fontSize:14,color:"#CCC",lineHeight:1.7,marginBottom:12}}>{d.desc}</p>
+      <div style={{borderTop:"1px solid #2A2A2A",paddingTop:12,fontSize:13,color:"#777",lineHeight:1.65}}>
+        <span style={{color:GL,fontWeight:600}}>In your marriage: </span>{d.marriage}
+      </div>
+    </div>
+  );
+}
+
+function Results({nameA,nameB,scoresA,scoresB,onRestart}){
+  const [view,setView]=useState("a");
+  const topA=topGifts(scoresA);
+  const topB=topGifts(scoresB);
+  const combo=getCombo(topA[0][0],topB[0][0]);
+  const tabs=[{k:"a",label:nameA},{k:"b",label:nameB},{k:"couple",label:"⚡ Couple Power"}];
+  const currentScores=view==="a"?scoresA:scoresB;
+  const currentTop=view==="a"?topA:topB;
+  const currentName=view==="a"?nameA:nameB;
+  return(
+    <div style={{minHeight:"100vh",background:"#0D0D0D",padding:"40px 20px 60px"}}>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:4,textTransform:"uppercase",color:G,marginBottom:10}}>Activation Report</p>
+          <h2 style={{fontSize:26,fontWeight:900}}>Your Power Has Been Revealed</h2>
+        </div>
+        {/* Tabs */}
+        <div style={{display:"flex",gap:6,background:"#1A1A1A",borderRadius:12,padding:4,marginBottom:24}}>
+          {tabs.map(t=>(
+            <button key={t.k} onClick={()=>setView(t.k)} style={{
+              flex:1,padding:"10px 4px",border:"none",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",
+              background:view===t.k?`linear-gradient(135deg,${G} 0%,${GD} 100%)`:"transparent",
+              color:view===t.k?"#0D0D0D":"#777",transition:"all 0.2s"
+            }}>{t.label}</button>
+          ))}
+        </div>
+
+        {/* Individual View */}
+        {(view==="a"||view==="b")&&<>
+          <GiftCard gift={currentTop[0][0]} rank={1} score={currentTop[0][1]}/>
+          <GiftCard gift={currentTop[1][0]} rank={2} score={currentTop[1][1]}/>
+          <div style={{background:"#1A1A1A",border:"1px solid #2A2A2A",borderRadius:16,padding:24,marginBottom:16}}>
+            <p style={{fontSize:12,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#555",marginBottom:18}}>Full Breakdown — {currentName}</p>
+            {topGifts(currentScores).map(([g,s])=>(
+              <div key={g} style={{display:"flex",alignItems:"center",gap:12,marginBottom:11}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#CCC",width:115,flexShrink:0}}>{g}</div>
+                <div style={{flex:1,height:7,background:"#2A2A2A",borderRadius:7,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:`${Math.round(s/15*100)}%`,background:`linear-gradient(90deg,${GD},${G})`,borderRadius:7}}/>
+                </div>
+                <div style={{fontSize:13,fontWeight:800,color:G,width:22,textAlign:"right"}}>{s}</div>
+              </div>
+            ))}
+          </div>
+        </>}
+
+        {/* Couple Power View */}
+        {view==="couple"&&<>
+          <div style={{background:"linear-gradient(135deg,#1F1500,#2A1E00,#1A1200)",border:`1px solid ${GD}`,borderRadius:20,padding:32,textAlign:"center",marginBottom:16,position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.12) 0%,transparent 70%)",pointerEvents:"none"}}/>
+            <p style={{fontSize:11,fontWeight:700,letterSpacing:4,textTransform:"uppercase",color:G,marginBottom:14,position:"relative"}}>Wonder Twins, Activate</p>
+            <div style={{fontSize:52,marginBottom:16,position:"relative"}}>⚡️</div>
+            <h3 style={{fontSize:24,fontWeight:900,color:GL,marginBottom:12,position:"relative"}}>{combo.name}</h3>
+            <p style={{fontSize:14,color:"#CCC",lineHeight:1.75,maxWidth:400,margin:"0 auto 20px",position:"relative"}}>{combo.desc}</p>
+            <div style={{background:"rgba(0,0,0,0.35)",border:`1px solid rgba(201,168,76,0.25)`,borderRadius:12,padding:"16px 20px",fontSize:14,color:GL,fontStyle:"italic",fontWeight:600,lineHeight:1.65,position:"relative"}}>"{combo.mission}"</div>
+          </div>
+          <div style={{background:"#1A1A1A",border:"1px solid #2A2A2A",borderRadius:16,padding:24,marginBottom:16}}>
+            <p style={{fontSize:12,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#555",marginBottom:14}}>Why You Stay In Power</p>
+            <p style={{fontSize:14,color:"#888",lineHeight:1.85}}>
+              You are not just staying in your marriage. You are staying <span style={{color:GL,fontWeight:600}}>in the power</span> that God fused when He joined you together. Your individual gifts are strong.<br/><br/>
+              Your combined power is stronger. The enemy doesn't want you to know this.<br/>
+              <strong style={{color:"#F5F0E8"}}>Now you do.</strong>
+            </p>
+          </div>
+          <div style={{background:"#1A1A1A",border:"1px solid #2A2A2A",borderRadius:16,padding:24,marginBottom:16}}>
+            <p style={{fontSize:12,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#555",marginBottom:14}}>Individual Powers Combined</p>
+            {[[nameA,topA[0][0]],[nameB,topB[0][0]]].map(([name,gift])=>{
+              const d=GIFTS[gift];
+              return(
+                <div key={name} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 0",borderBottom:"1px solid #2A2A2A",lastChild:{borderBottom:"none"}}}>
+                  <div style={{fontSize:26,width:44,height:44,background:"rgba(201,168,76,0.08)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{d.emoji}</div>
+                  <div>
+                    <div style={{fontSize:11,color:"#666",fontWeight:600,marginBottom:2}}>{name}'s Power</div>
+                    <div style={{fontSize:15,fontWeight:800,color:"#F5F0E8"}}>{gift}</div>
+                    <div style={{fontSize:12,color:"#777"}}>{d.tagline}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>}
+
+        <button onClick={onRestart} style={{...btnGhost,width:"100%",fontSize:14,padding:15,marginTop:8}}>↩ Take Again</button>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [phase,setPhase]=useState("hero");
+  const [names,setNames]=useState({a:"Spouse A",b:"Spouse B"});
+  const [answersA,setAnswersA]=useState({});
+  const [answersB,setAnswersB]=useState({});
+  const [qi,setQi]=useState(0);
+
+  const ans=phase==="assessing-a"?answersA:answersB;
+  const setAns=phase==="assessing-a"?setAnswersA:setAnswersB;
+
+  const handleAnswer=(idx,val)=>setAns(prev=>({...prev,[idx]:val}));
+
+  const handleNext=(isLast)=>{
+    if(!isLast){setQi(q=>q+1);return;}
+    if(phase==="assessing-a"){setPhase("transition");setQi(0);}
+    else{setPhase("results");}
+  };
+
+  const handleBack=()=>{
+    if(qi>0){setQi(q=>q-1);return;}
+    if(phase==="assessing-a")setPhase("setup");
+    else setPhase("transition");
+  };
+
+  const restart=()=>{
+    setPhase("hero");setAnswersA({});setAnswersB({});setQi(0);
+    setNames({a:"Spouse A",b:"Spouse B"});
+  };
+
+  return(
+    <div>
+      {phase==="hero"&&<Hero onStart={()=>setPhase("setup")}/>}
+      {phase==="setup"&&<Setup onBegin={(a,b)=>{setNames({a,b});setQi(0);setPhase("assessing-a");}} onBack={()=>setPhase("hero")}/>}
+      {phase==="assessing-a"&&<Assessment spouseName={names.a} answers={answersA} onAnswer={handleAnswer} onNext={handleNext} onBack={handleBack} qi={qi}/>}
+      {phase==="transition"&&<Transition nameA={names.a} nameB={names.b} onContinue={()=>{setQi(0);setPhase("assessing-b");}}/>}
+      {phase==="assessing-b"&&<Assessment spouseName={names.b} answers={answersB} onAnswer={handleAnswer} onNext={handleNext} onBack={handleBack} qi={qi}/>}
+      {phase==="results"&&<Results nameA={names.a} nameB={names.b} scoresA={computeScores(answersA)} scoresB={computeScores(answersB)} onRestart={restart}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
 </html>
